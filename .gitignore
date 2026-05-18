@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Node
+node_modules/
+serverless/.serverless/
+
+# Terraform
+terraform/.terraform/
+terraform/tfplan
+terraform/*.tfstate
+terraform/*.tfstate.backup
+
+# Monitoring output
+monitoring/monitoring.log
+
+# Receipts
+serverless/receipts-*.log
+
+# Ansible audit
+ansible-audit.log

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: orflow-config
+  namespace: orflow-staging
+  labels:
+    app:         orflow-api
+    environment: staging
+    managed-by:  kubectl
+data:
+  DB_HOST: "staging-db.orflow.svc.cluster.local"
+
+  ENV: "staging"

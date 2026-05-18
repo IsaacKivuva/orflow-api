@@ -1,0 +1,17 @@
+{
+  "name": "orflow-receipt-chain",
+  "version": "1.0.0",
+  "description": "OrFlow API serverless receipt chain — kk-receiver, kk-processor, kk-notifier",
+  "main": "handler.js",
+  "scripts": {
+    "start": "npx serverless offline start",
+    "print": "npx serverless print --format yaml",
+    "deploy:staging": "npx serverless deploy --stage staging",
+    "deploy:production": "npx serverless deploy --stage production"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "serverless": "^3.38.0",
+    "serverless-offline": "^13.3.0"
+  }
+}

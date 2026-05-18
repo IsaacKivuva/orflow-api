@@ -1,0 +1,62 @@
+service: orflow-receipt-chain
+
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: ${opt:stage, 'staging'}
+  region: us-east-1
+
+  environment:
+    STAGE:       ${self:provider.stage}
+    SERVICE:     orflow-receipt-chain
+    OUTPUT_FILE: receipts-${self:provider.stage}.log   # local stand-in for S3 bucket
+
+  logs:
+    restApi: true
+
+plugins:
+  - serverless-offline   
+
+custom:
+  serverless-offline:
+    httpPort: 3000
+    host: localhost
+    noPrependStageInUrl: true
+
+functions:
+
+  # kk-receiver
+  kk-receiver:
+    handler: handler.receiver
+    description: "Receives order events from OrFlow API staging deployment"
+    events:
+      - httpApi:
+          path:   /receive
+          method: POST
+    environment:
+      NEXT_FUNCTION: kk-processor
+
+  # kk-processor
+  kk-processor:
+    handler: handler.processor
+    description: "Processes and enriches receipt events"
+    events:
+      - httpApi:
+          path:   /process
+          method: POST
+    environment:
+      NEXT_FUNCTION: kk-notifier
+      TAX_RATE: "0.16"   # 16% VAT — configurable per stage
+
+  # kk-notifier
+  kk-notifier:
+    handler: handler.notifier
+    description: "Writes final receipt to output bucket"
+    events:
+      - httpApi:
+          path:   /notify
+          method: POST
+    environment:
+      OUTPUT_FILE: ${self:provider.environment.OUTPUT_FILE}

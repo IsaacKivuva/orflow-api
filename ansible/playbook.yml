@@ -1,0 +1,90 @@
+- name: Configure OrFlow API Kubernetes namespaces
+  hosts: localhost
+  gather_facts: false   
+
+  
+  vars:
+    staging_namespace:    "orflow-staging"
+    production_namespace: "orflow-production"
+    project_label:        "orflow-api"
+
+  tasks:
+
+    # 1. Verify namespaces exist
+    
+    - name: Verify staging namespace exists
+      command: kubectl get namespace {{ staging_namespace }}
+      register: staging_check
+      changed_when: false   
+
+    - name: Verify production namespace exists
+      command: kubectl get namespace {{ production_namespace }}
+      register: production_check
+      changed_when: false
+
+    - name: Report namespace verification
+      debug:
+        msg:
+          - "orflow-staging    : {{ 'OK' if staging_check.rc == 0 else 'MISSING' }}"
+          - "orflow-production : {{ 'OK' if production_check.rc == 0 else 'MISSING' }}"
+
+    # 2. Apply configuration labels
+    
+    - name: Label staging namespace as configured by Ansible
+      command: >
+        kubectl label namespace {{ staging_namespace }}
+        configured-by=ansible
+        --overwrite
+      changed_when: true
+
+    - name: Label production namespace as configured by Ansible
+      command: >
+        kubectl label namespace {{ production_namespace }}
+        configured-by=ansible
+        --overwrite
+      changed_when: true
+
+    
+    # 3. Verify resource quotas are in place
+   
+    - name: Check staging resource quota exists
+      command: kubectl get resourcequota -n {{ staging_namespace }}
+      register: staging_quota
+      changed_when: false
+
+    - name: Check production resource quota exists
+      command: kubectl get resourcequota -n {{ production_namespace }}
+      register: production_quota
+      changed_when: false
+
+    - name: Report resource quota status
+      debug:
+        msg:
+          - "Staging quota    : {{ 'OK' if staging_quota.rc == 0 else 'MISSING — check terraform apply' }}"
+          - "Production quota : {{ 'OK' if production_quota.rc == 0 else 'MISSING — check terraform apply' }}"
+
+    # 4. Write configuration audit file
+    
+    - name: Write configuration audit record
+      copy:
+        dest: "../ansible-audit.log"
+        content: |
+          OrFlow API — Ansible Configuration Audit
+          ==========================================
+          Run timestamp : {{ ansible_date_time.iso8601 | default('unknown') }}
+          Staging       : {{ staging_namespace }} — {{ 'verified' if staging_check.rc == 0 else 'FAILED' }}
+          Production    : {{ production_namespace }} — {{ 'verified' if production_check.rc == 0 else 'FAILED' }}
+          Staging quota : {{ 'present' if staging_quota.rc == 0 else 'MISSING' }}
+          Prod quota    : {{ 'present' if production_quota.rc == 0 else 'MISSING' }}
+          Configured-by : ansible
+          ==========================================
+        mode: "0644"
+
+  
+    # 5. Final summary
+    - name: Configuration complete
+      debug:
+        msg: >
+          Both namespaces verified and labelled.
+          Audit log written to ansible-audit.log.
+          Safe to proceed with Kubernetes manifest deployment.
