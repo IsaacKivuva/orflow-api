@@ -60,3 +60,5 @@ functions:
           method: POST
     environment:
       OUTPUT_FILE: ${self:provider.environment.OUTPUT_FILE}
+
+# God is good. All the time.
