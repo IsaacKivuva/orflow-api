@@ -1,39 +1,3 @@
-#!/usr/bin/env bash
-# =============================================================================
-# OrFlow API — monitoring/error_rate.sh
-# =============================================================================
-# Reads structured JSON logs from the OrFlow API pod and calculates
-# the error rate over a configurable time window.
-#
-# Writes a summary to monitoring/monitoring.log — the file Jenkins archives
-# as a build artifact and Nia can read without a monitoring dashboard.
-#
-# Why log-based and not Prometheus?
-#   Option B from the Track A spec: log-based error rate calculation
-#   following the Week 7 SLO pattern. Requires only the existing structured
-#   logging in main.py — no additional tooling needed.
-#
-# How it works:
-#   1. Pulls the last N lines of logs from the running pod via kubectl logs
-#   2. Parses each JSON log line with Python (available on all target systems)
-#   3. Counts total requests and error responses (status_code >= 400)
-#   4. Calculates error rate as a percentage
-#   5. Writes a structured summary to monitoring.log
-#   6. Exits non-zero if error rate exceeds the threshold — Jenkins sees this
-#
-# Usage:
-#   ./monitoring/error_rate.sh [namespace] [tail_lines] [threshold_percent]
-#
-# Defaults:
-#   namespace         = orflow-production
-#   tail_lines        = 200
-#   threshold_percent = 5
-#
-# Examples:
-#   ./monitoring/error_rate.sh
-#   ./monitoring/error_rate.sh orflow-staging 100 10
-# =============================================================================
-
 set -euo pipefail
 
 # -----------------------------------------------------------------------------
