@@ -1,12 +1,3 @@
-#!/usr/bin/env python3
-# =============================================================================
-# OrFlow API — monitoring/parse_logs.py
-# =============================================================================
-# Called by error_rate.sh to parse structured JSON logs from stdin.
-# Counts total requests and errors (status_code >= 400).
-# Prints results as KEY=VALUE lines for the shell script to read.
-# =============================================================================
-
 import sys
 import json
 
