@@ -115,15 +115,6 @@ pipeline {
                 echo "Staging deployment complete."
             }
         }
-
-        stage("Monitor") {
-            steps {
-                sh "chmod +x monitoring/error_rate.sh"
-                sh "./monitoring/error_rate.sh ${PRODUCTION_NS} 200 5"
-                archiveArtifacts artifacts: "monitoring/monitoring.log"
-            }
-        }
-
         // STAGE 6 — Smoke Test
 
         stage("Smoke Test") {
@@ -239,6 +230,14 @@ pipeline {
                          http://${PRODUCTION_HOST}/health || true
                 """
                 echo "Production verified."
+            }
+        }
+
+        stage("Monitor") {
+            steps {
+                sh "chmod +x monitoring/error_rate.sh"
+                sh "./monitoring/error_rate.sh ${STAGING_NS} 200 5"
+                archiveArtifacts artifacts: "monitoring/monitoring.log"
             }
         }
     }
