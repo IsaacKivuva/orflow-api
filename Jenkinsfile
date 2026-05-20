@@ -45,11 +45,11 @@ pipeline {
                 echo "Building Docker image inside Minikube Docker daemon..."
                 script {
                     sh """
-                        eval \$(minikube docker-env)
                         docker build \\
                             -t ${IMAGE_TAG} \\
                             -t ${IMAGE_LATEST} \\
                             ./app
+                        minikube image load ${IMAGE_LATEST}
                     """
                     echo "Image built: ${IMAGE_TAG}"
                 }
