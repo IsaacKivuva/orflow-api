@@ -10,8 +10,6 @@ serverless/.serverless/
 # Terraform
 terraform/.terraform/
 terraform/tfplan
-terraform/*.tfstate
-terraform/*.tfstate.backup
 
 # Monitoring output
 monitoring/monitoring.log
