@@ -104,8 +104,7 @@ pipeline {
 
                     # Expose via Service and Ingress
                     kubectl apply -f k8s/service.yaml   -n ${STAGING_NS}
-                    kubectl apply -f k8s/ingress.yaml   -n ${STAGING_NS}
-
+                    kubectl apply -f k8s/ingress-staging.yaml -n ${STAGING_NS}
                     # Wait for the rollout to complete before smoke testing
                     # This blocks until all pods are Running and Ready
                     kubectl rollout status deployment/${APP_NAME} \\
@@ -196,7 +195,7 @@ pipeline {
                     kubectl apply -f k8s/configmap-production.yaml -n ${PRODUCTION_NS}
                     kubectl apply -f k8s/deployment.yaml           -n ${PRODUCTION_NS}
                     kubectl apply -f k8s/service.yaml              -n ${PRODUCTION_NS}
-                    kubectl apply -f k8s/ingress.yaml              -n ${PRODUCTION_NS}
+                    kubectl apply -f k8s/ingress-production.yaml   -n ${PRODUCTION_NS}
 
                     kubectl rollout status deployment/${APP_NAME} \\
                         -n ${PRODUCTION_NS} \\

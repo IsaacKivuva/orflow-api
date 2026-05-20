@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: orflow-api
+  labels:
+    app:        orflow-api
+    managed-by: kubectl
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: api.orflow.local
+      http:
+        paths:
+          - path:     /
+            pathType: Prefix
+            backend:
+              service:
+                name: orflow-api
+                port:
+                  number: 80
